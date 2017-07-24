@@ -8,7 +8,11 @@
 
 namespace TerryLucasInterFaceLog\Logger;
 
-
+/**
+ * Class Precaution
+ * User: Terry Lucas
+ * @package TerryLucasInterFaceLog\Logger
+ */
 class Precaution
 {
 

@@ -1,0 +1,2 @@
+
+Route::get('/terrylucas/pre/', 'PrecautionController@index')->name('precaution');
