@@ -34,11 +34,4 @@ class Logger implements ILogger
         }
     }
 
-    /**
-     * User: Terry Lucas
-     */
-    public function read()
-    {
-        // TODO: Implement read() method.
-    }
 }

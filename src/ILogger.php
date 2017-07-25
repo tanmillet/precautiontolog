@@ -12,5 +12,4 @@ namespace TerryLucasInterFaceLog\Logger;
 interface ILogger
 {
         public function write($method , array $options = []);
-        public function read();
 }
