@@ -25,7 +25,7 @@ class Logger implements ILogger
      * @param array $options
      * @throws \Exception
      */
-    public function write($method, array $options = [])
+    public function write($interfacetag, array $options = [])
     {
         try {
 

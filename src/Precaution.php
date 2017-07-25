@@ -33,7 +33,12 @@ class Precaution
         $this->ilogger = $logger;
     }
 
-    public function preLogInfo($date)
+    /**
+     * User: Terry Lucas
+     * @param $date
+     * @return string
+     */
+    public function pre($date)
     {
         try {
             //进行需要更新的数据进行预处理
@@ -65,5 +70,22 @@ class Precaution
         }
 
         Log::info(json_encode($datas));
+    }
+
+    /**
+     * User: Terry Lucas
+     * @param $interfacetag uniqueid
+     * @param array $options
+     * @return mixed
+     */
+    public function precordlog($interfacetag, array $options = [])
+    {
+        //日志记录
+        try {
+            $this->ilogger->write($interfacetag, $options);
+
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
+        }
     }
 }
