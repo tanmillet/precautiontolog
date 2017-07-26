@@ -29,7 +29,6 @@ class PreAnalysisCommand extends Command
     public function fire()
     {
         $optime = (empty($this->argument('date'))) ? date('Y-m-d') : $this->argument('optime');
-
         $pre = new Precaution();
         $res = $pre->pre($optime);
 
