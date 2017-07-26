@@ -107,6 +107,7 @@ class Precaution
 
             //
             $precautiontags = $this->getPrecautionTags();
+            $temps = [];
             foreach ($precautiontags as $precautiontag) {
                 $analysisDatas = $this->getAnalysisDatas($mimx, $precautiontag['uniqueid']);
                 if(empty($analysisDatas)) continue;
@@ -119,24 +120,26 @@ class Precaution
 
                 //
                 $day = $this->getPreDateRange();
-                $sum = $this->splitArr($this->daySplit());
+                $avgs = $this->splitArr($this->daySplit());
                 foreach ($analysisDatas as $analysisData) {
                     $andata = explode(',' , trim(trim($analysisData , ']') , '['));
                     foreach ($andata as $key=>$item) {
-                        $sum[$key] += $item;
+                        $avgs[$key] += $item;
                     }
                 }
 
                 //
-                foreach ($sum as &$s){
+                foreach ($avgs as &$s){
                     $s = (int)ceil($s / $day);
                 }
 
-                //data update to db
-
+                $temps[$precautiontag['uniqueid']] = $avgs;
             }
 
-            return 'Early warning analysis reports generate success.';
+            //data update to db
+            $msg = (!empty($temps)) ? $this->recordavg($temps) : 'Early warning analysis reports have no data.';
+
+            return (empty($msg)) ? 'Early warning analysis reports generate success.' : $msg;
         } catch (\Exception $e) {
             return $e->getMessage();
         }

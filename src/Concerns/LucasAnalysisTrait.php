@@ -4,6 +4,7 @@ namespace TerryLucasInterFaceLog\Logger\Concerns;
 
 use Illuminate\Support\Facades\DB;
 use TerryLucasInterFaceLog\Logger\LucasAnalysis;
+use TerryLucasInterFaceLog\Logger\LucasAnalysisRes;
 
 /**
  * Class PrecautionMessages
@@ -35,10 +36,9 @@ trait LucasAnalysisTrait
             }
 
             DB::commit();
-
         } catch (\Exception $e) {
-
             DB::rollBack();
+
             return 'Error logging analysis result.';
         }
 
@@ -59,4 +59,34 @@ trait LucasAnalysisTrait
             ->where('precautiontags', '=', $precautiontags)
             ->get();
     }
+
+    /**
+     * User: Terry Lucas
+     * @param $datas
+     * @return string
+     */
+    public function recordavg($datas)
+    {
+        try {
+            DB::beginTransaction();
+
+            foreach ($datas as $key => $data) {
+                LucasAnalysisRes::query()->updateOrCreate([
+                    'precautiontags' => $key,
+                ], [
+                    'precautiontags' => $key,
+                    'preinfo' => json_encode($data),
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return 'Error LucasAnalysisRes update.';
+        }
+
+        return '';
+    }
+
 }
