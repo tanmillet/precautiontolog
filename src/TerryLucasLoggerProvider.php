@@ -1,15 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Terry Lucas
- * Date: 2017/7/20
- * Time: 16:43
- */
 
 namespace TerryLucasInterFaceLog\Logger;
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class TerryLucasLoggerProvider
+ * User: Terry Lucas
+ * @package TerryLucasInterFaceLog\Logger
+ */
 class TerryLucasLoggerProvider extends ServiceProvider
 {
     /**

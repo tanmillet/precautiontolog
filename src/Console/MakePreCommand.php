@@ -29,6 +29,11 @@ class MakePreCommand extends Command
      */
     protected $views = [];
 
+    /**
+     * User: Terry Lucas
+     * Date: ${DATE}
+     * @var array
+     */
     protected $versions = [50, 51, 52, 53, 54, 55];
 
     /**

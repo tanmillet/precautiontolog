@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Terry Lucas
- * Date: 2017/7/24
- * Time: 16:22
- */
 
 namespace TerryLucasInterFaceLog\Logger\Console;
 

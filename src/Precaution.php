@@ -1,15 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Terry Lucas
- * Date: 2017/7/24
- * Time: 14:58
- */
 
 namespace TerryLucasInterFaceLog\Logger;
 
 use Carbon\Carbon;
+use Illuminate\Log\Writer;
 use Illuminate\Support\Facades\Log;
+use Monolog\Logger;
 use TerryLucasInterFaceLog\Logger\Concerns\PrecautionTools;
 
 /**
@@ -21,6 +17,10 @@ class Precaution
 {
     use  PrecautionTools;
 
+    /**
+     * User: Terry Lucas
+     * @var Writer
+     */
     protected $ilogger;
 
     /**
@@ -28,9 +28,9 @@ class Precaution
      * Precaution constructor.
      * @param ILogger $logger
      */
-    public function __construct(ILogger $logger)
+    public function __construct()
     {
-        $this->ilogger = $logger;
+        $this->ilogger = new Writer(new Logger(''));
     }
 
     /**
@@ -41,35 +41,37 @@ class Precaution
     public function pre($date)
     {
         try {
-            //进行需要更新的数据进行预处理
+            //Preprocess the data that needs to be updated
             $datas = $this->precautionContainer();
 
-            //日志存储服务器地址
-            // $hosts = $this->getHosts();
-            // foreach ($hosts as $host) {
+            //Log the server path
             $filePath = $this->getFilePath($date);
             if (!file_exists($filePath)) {
-                return '';
+                return 'Parsing log files does not exist.';
             }
 
             $content = file_get_contents($filePath);
             preg_match_all('|\[[\d-]+\s([\d:]+)\]\s[^:]*:\s([a-zA-Z1-9-_]+)|', $content, $matches);
             if (!$matches[1] || !isset($matches[2])) {
-                return '';
+                return 'Parse log file failed.';
             }
+
             foreach ($matches[2] as $k => $v) {
                 if (!isset($datas[$v])) {
                     continue;
                 }
+
                 $ind = Carbon::parse($matches[1][$k])->hour * 60 + Carbon::parse($matches[1][$k])->minute;
                 $datas[$v][$ind] += 1;
             }
-            // }
+
         } catch (\Exception $e) {
             return $e->getMessage();
         }
 
         Log::info(json_encode($datas));
+
+        return 'Resolve log file success.';
     }
 
     /**
@@ -80,9 +82,10 @@ class Precaution
      */
     public function precordlog($interfacetag, array $options = [])
     {
-        //日志记录
         try {
-            $this->ilogger->write($interfacetag, $options);
+            $dirpath = storage_path() . '/logs/' . date('Y-m-d', time());
+            $this->ilogger->useDailyFiles($dirpath . '/laravel-analysis-info.log', 30);
+            $this->ilogger->write('info', $interfacetag . ' ' . json_encode($options));
 
         } catch (\Exception $e) {
             Log::info($e->getMessage());

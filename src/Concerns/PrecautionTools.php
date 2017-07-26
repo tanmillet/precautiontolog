@@ -64,7 +64,7 @@ trait PrecautionTools
     {
         $storage = Config::get('precaution.storage');
 
-        return storage_path($storage . "/laravel-analysis-info-" . $date . ".log");
+        return storage_path($storage . '/' . $date . "/laravel-analysis-info-" . $date . ".log");
     }
 
     /**
