@@ -92,4 +92,15 @@ class Precaution
             Log::info($e->getMessage());
         }
     }
+
+    /**
+     * User: Terry Lucas
+     * @return string
+     */
+    public function preport()
+    {
+
+
+        return 'Early warning analysis reports generate success.';
+    }
 }
