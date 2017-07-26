@@ -70,8 +70,16 @@ class MakePreCommand extends Command
             file_get_contents(__DIR__ . '/stubs/routes.stub'),
             FILE_APPEND
         );
+
         //
-        $this->info('Precaution scaffolding generated successfully.' . $version);
+        file_put_contents(
+            base_path('database/migrations/2017_07_26_000000_create_lucas_analysis_table.php'),
+            file_get_contents(__DIR__ . '/stubs/create_lucas_analysis_table.stub'),
+            FILE_APPEND
+        );
+
+        //
+        $this->info('Precaution scaffolding generated successfully.');
     }
 
     /**

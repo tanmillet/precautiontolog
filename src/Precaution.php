@@ -42,7 +42,8 @@ class Precaution
     {
         try {
             //Preprocess the data that needs to be updated
-            $datas = $this->precautionContainer();
+            $res = $this->precautionContainer();
+            $datas = $res['data'];
 
             //Log the server path
             $filePath = $this->getFilePath($date);
@@ -69,9 +70,9 @@ class Precaution
             return $e->getMessage();
         }
 
-        Log::info(json_encode($datas));
+        $msg = (!empty($datas)) ? $this->recored($datas, $date , $res['granularity']) : 'Parsing logs have no data.';
 
-        return 'Resolve log file success.';
+        return (empty($msg)) ? 'Resolve log file success.' : $msg;
     }
 
     /**

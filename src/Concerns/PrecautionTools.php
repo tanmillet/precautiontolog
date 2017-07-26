@@ -3,6 +3,8 @@
 namespace TerryLucasInterFaceLog\Logger\Concerns;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use TerryLucasInterFaceLog\Logger\LucasAnalysis;
 
 /**
  * Class PrecautionMessages
@@ -38,7 +40,10 @@ trait PrecautionTools
             $datas[$precautiontag['uniqueid']] = $items;
         }
 
-        return $datas;
+        return [
+            'granularity' => $granularity,
+            'data' => $datas
+        ];
     }
 
     /**
@@ -52,6 +57,42 @@ trait PrecautionTools
         if (!isset($precautions) || !is_array($precautions)) throw  new \Exception('The log server is not configured');
 
         return $precautions;
+    }
+
+    /**
+     * User: Terry Lucas
+     * @param $datas
+     * @param $date
+     * @param $granularity
+     * @return string
+     */
+    public function recored($datas, $date, $granularity)
+    {
+        try {
+            DB::beginTransaction();
+
+            foreach ($datas as $key => $data) {
+                LucasAnalysis::updateOrCreate([
+                    'recordate' => $date,
+                    'granularity' => $granularity,
+                    'precautiontags' => $key,
+                ], [
+                    'recordate' => $date,
+                    'granularity' => $granularity,
+                    'precautiontags' => $key,
+                    'datainfo' => json_encode($data),
+                ]);
+            }
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return 'Error logging analysis result.';
+        }
+
+        return '';
     }
 
     /**
