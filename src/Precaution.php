@@ -92,4 +92,53 @@ class Precaution
             Log::info($e->getMessage());
         }
     }
+
+
+    /**
+     * User: Terry Lucas
+     * @return string
+     */
+    public function preport()
+    {
+        try {
+            //
+            $mimx = $this->getDateRangeValue();
+            if (!isset($mimx[0]) || !isset($mimx[1])) throw new \Exception('The rules of the Settings is not reasonable');
+
+            //
+            $precautiontags = $this->getPrecautionTags();
+            foreach ($precautiontags as $precautiontag) {
+                $analysisDatas = $this->getAnalysisDatas($mimx, $precautiontag['uniqueid']);
+                if(empty($analysisDatas)) continue;
+
+                //
+                $collection = collect($analysisDatas->toArray());
+                $filtered = $collection->pluck(['datainfo']);
+                $analysisDatas = $filtered->all();
+                if(empty($analysisDatas)) continue;
+
+                //
+                $day = $this->getPreDateRange();
+                $sum = $this->splitArr($this->daySplit());
+                foreach ($analysisDatas as $analysisData) {
+                    $andata = explode(',' , trim(trim($analysisData , ']') , '['));
+                    foreach ($andata as $key=>$item) {
+                        $sum[$key] += $item;
+                    }
+                }
+
+                //
+                foreach ($sum as &$s){
+                    $s = (int)ceil($s / $day);
+                }
+
+                //data update to db
+
+            }
+
+            return 'Early warning analysis reports generate success.';
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
 }

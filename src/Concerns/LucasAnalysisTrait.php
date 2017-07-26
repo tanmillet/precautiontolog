@@ -52,11 +52,10 @@ trait LucasAnalysisTrait
      * @param $precautiontags
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getAnalysisDatas($date, $granularity, $precautiontags)
+    public function getAnalysisDatas($date, $precautiontags)
     {
         return LucasAnalysis::query()->where('recordate', '>=', $date[0])
             ->where('recordate', '<=', $date[1])
-            ->where('granularity', '=', $granularity)
             ->where('precautiontags', '=', $precautiontags)
             ->get();
     }
