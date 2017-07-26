@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Log\Writer;
 use Illuminate\Support\Facades\Log;
 use Monolog\Logger;
+use TerryLucasInterFaceLog\Logger\Concerns\LucasAnalysisTrait;
 use TerryLucasInterFaceLog\Logger\Concerns\PrecautionTools;
 
 /**
@@ -15,7 +16,7 @@ use TerryLucasInterFaceLog\Logger\Concerns\PrecautionTools;
  */
 class Precaution
 {
-    use  PrecautionTools;
+    use  PrecautionTools, LucasAnalysisTrait;
 
     /**
      * User: Terry Lucas
@@ -42,8 +43,7 @@ class Precaution
     {
         try {
             //Preprocess the data that needs to be updated
-            $res = $this->precautionContainer();
-            $datas = $res['data'];
+            $datas = $this->precautionContainer();
 
             //Log the server path
             $filePath = $this->getFilePath($date);
@@ -70,7 +70,7 @@ class Precaution
             return $e->getMessage();
         }
 
-        $msg = (!empty($datas)) ? $this->recored($datas, $date , $res['granularity']) : 'Parsing logs have no data.';
+        $msg = (!empty($datas)) ? $this->recored($datas, $date) : 'Parsing logs have no data.';
 
         return (empty($msg)) ? 'Resolve log file success.' : $msg;
     }
@@ -91,16 +91,5 @@ class Precaution
         } catch (\Exception $e) {
             Log::info($e->getMessage());
         }
-    }
-
-    /**
-     * User: Terry Lucas
-     * @return string
-     */
-    public function preport()
-    {
-
-
-        return 'Early warning analysis reports generate success.';
     }
 }

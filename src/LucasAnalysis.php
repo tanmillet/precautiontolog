@@ -24,7 +24,7 @@ class LucasAnalysis extends Model
      * @var array
      */
     protected $fillable = [
-        'granularity', 'precautiontags', 'recordate','datainfo'
+        'precautiontags', 'recordate','datainfo'
     ];
 
 }

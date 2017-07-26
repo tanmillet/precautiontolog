@@ -2,9 +2,8 @@
 
 namespace TerryLucasInterFaceLog\Logger\Concerns;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
-use TerryLucasInterFaceLog\Logger\LucasAnalysis;
 
 /**
  * Class PrecautionMessages
@@ -20,14 +19,7 @@ trait PrecautionTools
     public function precautionContainer()
     {
         //获取系统的预警粒度
-        $granularity = (int)Config::get('precaution.granularity');
-        if (!is_numeric($granularity)) throw new \Exception('The granularity of the Settings is not reasonable');
-        $cont = $this->daySplit($granularity);
-
-        $items = [];
-        for ($i = 0; $i < $cont; $i++) {
-            $items[] = 0;
-        }
+        $items = $this->splitArr();
 
         //进行预警或者监控的接口
         $datas = [];
@@ -40,10 +32,36 @@ trait PrecautionTools
             $datas[$precautiontag['uniqueid']] = $items;
         }
 
-        return [
-            'granularity' => $granularity,
-            'data' => $datas
-        ];
+        return $datas;
+    }
+
+    /**
+     * User: Terry Lucas
+     * @param $granularity
+     * @return array
+     */
+    public function splitArr()
+    {
+        $cont = $this->daySplit(1);
+        $items = [];
+        for ($i = 0; $i < $cont; $i++) {
+            $items[] = 0;
+        }
+
+        return $items;
+    }
+
+    /**
+     * User: Terry Lucas
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getPrecautionTags()
+    {
+        $precautiontags = Config::get('precaution.precautiontags');
+        if (!isset($precautiontags) || !is_array($precautiontags)) throw  new \Exception('The precautiontags is not configured');
+
+        return $precautiontags;
     }
 
     /**
@@ -61,38 +79,23 @@ trait PrecautionTools
 
     /**
      * User: Terry Lucas
-     * @param $datas
-     * @param $date
-     * @param $granularity
-     * @return string
+     * @return mixed
+     * @throws \Exception
      */
-    public function recored($datas, $date, $granularity)
+    public function getRulesDateRange()
     {
-        try {
-            DB::beginTransaction();
+        $setRules = Config::get('precaution.setrules');
+        $rules = Config::get('precaution.rules');
 
-            foreach ($datas as $key => $data) {
-                LucasAnalysis::updateOrCreate([
-                    'recordate' => $date,
-                    'granularity' => $granularity,
-                    'precautiontags' => $key,
-                ], [
-                    'recordate' => $date,
-                    'granularity' => $granularity,
-                    'precautiontags' => $key,
-                    'datainfo' => json_encode($data),
-                ]);
-            }
+        if (!isset($setRules) || !isset($rules[$setRules])) throw  new \Exception('Configuration rule error.');
 
-            DB::commit();
+        if (!isset($rules[$setRules]['avg']) || !is_numeric($rules[$setRules]['avg'])) throw  new \Exception('Configuration rule error,[avg] key is not set or set the error');
 
-        } catch (\Exception $e) {
+        $day = $rules[$setRules]['avg'];
+        $start = Carbon::parse()->subDays($day)->format('Y-m-d');
+        $end = Carbon::parse()->subDay()->format('Y-m-d');
 
-            DB::rollBack();
-            return 'Error logging analysis result.';
-        }
-
-        return '';
+        return $dayMinMax = [$start, $end];
     }
 
     /**

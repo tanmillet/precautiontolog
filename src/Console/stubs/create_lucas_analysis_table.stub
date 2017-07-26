@@ -19,7 +19,6 @@ class CreateLucasAnalysisTable extends Migration
     {
         Schema::create('lucas_analysis', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('granularity');
             $table->string('precautiontags');
             $table->text('datainfo');
             $table->timestamps();
