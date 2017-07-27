@@ -1,2 +1,2 @@
 
-Route::get('/terrylucas/pre/', 'PrecautionController@index')->name('precaution');
+Route::match(['get', 'post'], '/terrylucas/pre/', 'PrecautionController@index')->name('precaution');

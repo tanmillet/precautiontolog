@@ -104,7 +104,22 @@ trait PrecautionTools
         if (!isset($setRules) || !isset($rules[$setRules])) throw  new \Exception('Configuration rule error.');
         if (!isset($rules[$setRules]['avg']) || !is_numeric($rules[$setRules]['avg'])) throw  new \Exception('Configuration rule error,[avg] key is not set or set the error');
 
-        return   $rules[$setRules]['avg'];
+        return $rules[$setRules]['avg'];
+    }
+
+    /**
+     * User: Terry Lucas
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getPreRules()
+    {
+        $setRules = Config::get('precaution.setrules');
+        $rules = Config::get('precaution.rules');
+
+        if (!isset($setRules) || !isset($rules[$setRules])) throw  new \Exception('Configuration rule error.');
+
+        return $rules[$setRules];
     }
 
     /**

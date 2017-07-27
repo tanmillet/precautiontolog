@@ -1,18 +1,81 @@
 <?php
 
-namespace {{namespace}}Http\Controllers;
+namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use TerryLucasInterFaceLog\Logger\Concerns\LucasAnalysisTrait;
+use TerryLucasInterFaceLog\Logger\Concerns\PrecautionTools;
 
+/**
+ * Class PrecautionController
+ * User: Terry Lucas
+ * @package App\Http\Controllers
+ */
 class PrecautionController extends Controller
 {
+    use LucasAnalysisTrait, PrecautionTools;
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * User: Terry Lucas
+     * @param Request $request
+     * @return array|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('precaution');
+
+        if ($request->isMethod('POST') && $request->ajax()) {
+            $datas = [];
+            $preTime = Carbon::now()->hour * 60 + Carbon::now()->minute - 1;
+            if ($preTime < 0) return '';
+
+            //可以自行定义测试 这个是DEMO示例
+            /*****************************测试预警粒度 为1分钟的测试数据*****************************/
+            //获取预测平均数据
+            $preInfos = $this->getPreInfo();
+            $rules = $this->getPreRules();
+
+            foreach ($preInfos as $preInfo) {
+                $pre = (!isset($preInfo->preinfo)) ? $this->splitArr() : explode(',', trim(trim($preInfo->preinfo, '['), ']'));
+                $datas[$preInfo->precautiontags]['pre'] = $pre;
+
+                $bepre = $this->getAnalysisLogInfo($preInfo->precautiontags)->toArray();
+                $bepre = (empty($bepre)) ? $this->splitArr() : explode(',', trim(trim($bepre[0], '['), ']'));
+                $datas[$preInfo->precautiontags]['bepre'] = $bepre;
+
+                //进行预测
+                $avg = $rules['avg'];
+                $mingrade = $rules['mingrade'];
+                $pres = true; //正常
+                if ((int)$pre[$preTime] > 0) {
+                    if ((int)$bepre[$preTime] > 0) {
+                        $pres = (int)ceil((int)$pre[$preTime] * ($mingrade / 100)) > (int)$bepre[$preTime] ? false : true;
+                    } else {
+                        $pres = (int)ceil((int)$pre[$preTime] / $avg) > (int)$bepre[$preTime] ? false : true;
+                    }
+                }
+
+                $datas[$preInfo->precautiontags]['res'] = [
+                    'val' => [$pre[$preTime], $bepre[$preTime]],
+                    'resval' => $pres,
+                    'minute' => $preTime
+                ];
+            }
+
+            $infos = [];
+            foreach ($datas as $key=>$data){
+                if($data['res']['resval']){
+                    $msg = '<span style="color: #2a88bd">【正常】'.'今天 ' . $key . ' 接口预测正常 ' . $data['res']['minute'] . ' 分钟 达标量：' . $data['res']['val'][0] . '实际量：' . $data['res']['val'][1] . '</span>';
+                }else{
+                    $msg = '<span style="color: red">【异常】'.'今天 ' . $key . ' 接口预测报警 ' . $data['res']['minute'] . ' 分钟 达标量：' . $data['res']['val'][0] . '实际量：' . $data['res']['val'][1] . '</span>';
+                }
+
+                array_push($infos , $msg);
+            }
+
+            return $infos;
+        }
+
+        return view('precaution', compact('datas'));
     }
 }
